@@ -18,7 +18,7 @@ phases:
   post_build:
     commands:
       - echo Build Completed on 'date'
-      - Pushing the Docker image..
+      - echo Pushing the Docker image..
       - docker push $REPOSITORY_URL:latest
       - docker push $REPOSITORY_URL:$IMAGE_TAG
       - echo Writing image definitions file...
