@@ -2,13 +2,13 @@ version: 02
 
 phases:
   pre_build:
-  commands:
-    - echo Logging into Amazon ECR...
-    - aws --version
-    - aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 385704849761.dkr.ecr.eu-north-1.amazonaws.com
-    - REPOSITORY_URL=385704849761.dkr.ecr.eu-north-1.amazonaws.com/docker_lab
-    - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-    - IMAGE_TAG=$(echo $CODEBUILD_BUILD_ID | aws -F":" '{print $2}')
+    commands:
+      - echo Logging into Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 385704849761.dkr.ecr.eu-north-1.amazonaws.com
+      - REPOSITORY_URL=385704849761.dkr.ecr.eu-north-1.amazonaws.com/docker_lab
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=$(echo $CODEBUILD_BUILD_ID | aws -F":" '{print $2}')
   build:
     commands:
       - echo Build started on 'date'
@@ -24,5 +24,5 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"nodeapp","imageUri":"%s"}]' $REPOSITORY_URL:$IMAGE_TAG > imagedefinitions.json
       - cat imagedefinitions.json
-  artifacts:
-    files: imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
