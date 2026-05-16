@@ -1,0 +1,28 @@
+version: 02
+
+phases:
+  pre_build:
+  commands:
+    - echo Logging into Amazon ECR...
+    - aws --version
+    - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 385704849761.dkr.ecr.eu-north-1.amazonaws.com
+    - REPOSITORY_URL=385704849761.dkr.ecr.eu-north-1.amazonaws.com/docker_lab
+    - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+    - IMAGE_TAG=$(echo $CODEBUILD_BUILD_ID | aws -F":" '{print $2}')
+  build:
+    commands:
+      - echo Build started on 'date'
+      - echo Building Docker image
+      - docker build -t $REPOSITORY_URL:latest .
+      - docker tag $REPOSITORY_URL:latest $REPOSITORY_URL:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build Completed on 'date'
+      - Pushing the Docker image..
+      - docker push $REPOSITORY_URL:latest
+      - docker push $REPOSITORY_URL:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"nodeapp","imageUri":"%s"}]' $REPOSITORY_URL:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json
+  artifacts:
+    files: imagedefinitions.json
